@@ -1,0 +1,17 @@
+package DDecayAlg
+
+use BesPolicy BesPolicy-*
+use GaudiInterface GaudiInterface-* External
+
+use EventModel   EventModel-*  Event
+use EvtRecEvent  EvtRecEvent-*      Event
+use MdcRawEvent  MdcRawEvent-* Mdc
+use DTagTool     DTagTool-*    Analysis
+use McTruth      McTruth-*     Event
+use BesROOT      BesROOT-00-*     External
+use ReconEvent   ReconEvent-*  Event
+use ParticleID   ParticleID-*  Analysis
+use VertexFit    VertexFit-*   Analysis
+
+apply_pattern component_library
+library DDecayAlg  *.cxx

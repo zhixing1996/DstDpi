@@ -1,0 +1,21 @@
+ApplicationMgr.DLLs += {"DDecayAlg"};
+ApplicationMgr.TopAlg +={ "DDecayAlg" };
+
+DTag.NeutralDReconstruction  = true;
+DTag.ChargedDReconstruction  = true;
+DTag.DsReconstruction        = true;
+
+NeutralDSelector.UseMbcCuts = false;
+NeutralDSelector.UseDeltaECuts = false;
+NeutralDSelector.UseDeltaMassCuts = true;
+
+ChargedDSelector.UseMbcCuts = false;
+ChargedDSelector.UseDeltaECuts = false;
+ChargedDSelector.UseDeltaMassCuts = true;
+
+DsSelector.UseMbcCuts = false;
+DsSelector.UseDeltaECuts = false;
+DsSelector.UseDeltaMassCuts = true;
+
+#include "$VERTEXFITROOT/share/jobOptions_VertexDbSvc.txt"
+#include "$SIMPLEPIDSVCROOT/share/jobOptions_SimplePIDSvc.txt"
