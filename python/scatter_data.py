@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 """
-Plot recoiling mass of tagged pi and D
+Plot recoiling mass of D**2 vs invariant mass of Dpi**2
 """
 
 __author__ = "Maoqiang JING <jingmq@ihep.ac.cn>"
 __copyright__ = "Copyright (c) Maoqiang JING"
-__created__ = "[2020-04-26 Sun 21:22]"
+__created__ = "[2020-04-27 Mon 20:26]"
 
 from ROOT import *
 import sys, os
 import logging
-from math import *
+from tools import convert_name
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
 gStyle.SetOptTitle(0) # quench title
 gStyle.SetPadTickX(1) # dicide on boxing on or not of x and y axis  
@@ -19,10 +19,10 @@ gStyle.SetPadTickY(1) # dicide on boxing on or not of x and y axis
 def usage():
     sys.stdout.write('''
 NAME
-    plot_rm_Dpi.py
+    scatter_data.py
 
 SYNOPSIS
-    ./plot_rm_Dpi.py [ecms] [D_sample]
+    ./scatter_data.py [ecms] [D_sample] [D_type]
 
 AUTHOR
     Maoqiang JING <jingmq@ihep.ac.cn>
@@ -37,17 +37,14 @@ def set_pavetext(pt):
     pt.SetTextAlign(10)
     pt.SetTextSize(0.03)
 
-def rm_Dpi_fill(t, h):
+def fill(t, h):
     for ientry in xrange(t.GetEntries()):
         t.GetEntry(ientry)
-        h.Fill(t.m_rm_Dpi)
+        h.Fill(t.m_rm2_D, t.m_m2_Dpi)
 
 def set_histo_style(h, xtitle, ytitle):
     h.GetXaxis().SetNdivisions(509)
     h.GetYaxis().SetNdivisions(504)
-    h.SetLineWidth(2)
-    h.SetLineWidth(2)
-    h.SetStats(0)
     h.SetStats(0)
     h.GetXaxis().SetTitleSize(0.06)
     h.GetXaxis().SetTitleOffset(1.)
@@ -56,10 +53,10 @@ def set_histo_style(h, xtitle, ytitle):
     h.GetYaxis().SetTitleOffset(1.)
     h.GetYaxis().SetLabelOffset(0.01)
     h.GetXaxis().SetTitle(xtitle)
-    h.GetXaxis().CenterTitle()
     h.GetYaxis().SetTitle(ytitle)
+    h.GetXaxis().CenterTitle()
     h.GetYaxis().CenterTitle()
-    h.SetFillColor(1)
+    h.SetLineColor(1)
 
 def set_canvas_style(mbc):
     mbc.SetFillColor(0)
@@ -68,7 +65,7 @@ def set_canvas_style(mbc):
     mbc.SetTopMargin(0.1)
     mbc.SetBottomMargin(0.15)
 
-def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
+def plot(path, leg_title, ecms, min, max, bins, D_sample, D_type):
     try:
         f_data = TFile(path[0])
         t_data = f_data.Get('save')
@@ -80,54 +77,55 @@ def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
 
     mbc = TCanvas('mbc', 'mbc', 800, 600)
     set_canvas_style(mbc)
-    content = (xmax - xmin)/xbins * 1000
-    ytitle = 'Events/%.1f MeV'%content
-    xtitle = ''
     if D_sample == 'Dplus':
-        xtitle = 'RM(D^{+}#pi^{-}_{0})(GeV)'
+        xtitle = 'RM^{2}(D^{+})(GeV^{2})'
+        ytitle = 'M^{2}(D^{+}#pi_{0}^{-})(GeV^{2})'
     if D_sample == 'D0':
-        xtitle = 'RM(D^{0}#pi^{+}_{0})(GeV)'
-    h_data = TH1F('data', 'data', xbins, xmin, xmax)
-    
+        xtitle = 'RM^{2}(D^{0})(GeV^{2})'
+        ytitle = 'M^{2}(D^{0}#pi_{0}^{+})(GeV^{2})'
+    h_data = TH2F('scatter_data', 'scatter plot of RM2(D) and M2(Dpi)', bins, min, max, bins, min, max)
+
     set_histo_style(h_data, xtitle, ytitle)
-    rm_Dpi_fill(t_data, h_data)
+    fill(t_data, h_data)
     
     if not os.path.exists('./figs/'):
         os.makedirs('./figs/')
     
-    h_data.Draw('E1')
+    h_data.Draw('COLZ')
 
-    if D_sample == 'Dplus':
-        pt = TPaveText(0.2, 0.7, 0.45, 0.85, "BRNDC")
-        set_pavetext(pt)
-        pt.Draw()
-        pt.AddText(leg_title)
-        pt.AddText('D^{+}#rightarrowK^{-}#pi^{+}#pi^{+}')
-    if D_sample == 'D0':
-        pt = TPaveText(0.2, 0.7, 0.45, 0.85, "BRNDC")
-        set_pavetext(pt)
-        pt.Draw()
-        pt.AddText(leg_title)
-        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}')
-        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{0}')
-        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{+}#pi^{-}')
+    pt = TPaveText(0.65, 0.7, 0.85, 0.85, "BRNDC")
+    set_pavetext(pt)
+    pt.Draw()
+    pt.AddText(leg_title)
+    if D_sample == 'Dplus' and D_type == 'D':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{+}#pi_{0}^{-}#bar{D^{0}}')
+    if D_sample == 'Dplus' and D_type == 'Dst':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{+}#pi_{0}^{-}#bar{D^{*0}}')
+    if D_sample == 'D0' and D_type == 'D':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{0}#pi_{0}^{+}D^{-}')
+    if D_sample == 'D0' and D_type == 'Dst':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{0}#pi_{0}^{+}D^{*-}')
 
-    mbc.SaveAs('./figs/rm_Dpi_'+str(ecms)+'_'+D_sample+'.pdf')
+    mbc.SaveAs('./figs/scatter_data_'+str(ecms)+'_'+D_sample+'_'+D_type+'.pdf')
 
     # raw_input('Press <Enter> to end...')
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    if len(args)<2:
+    if len(args)<3:
         usage()
         sys.exit()
     ecms = int(args[0])
     D_sample = args[1]
+    D_type = args[2]
 
-    path =[]
-    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/' + str(ecms) + '/data_' + str(ecms) + '_DstDpi_'+D_sample+'.root')
+    path = []
+    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'_'+convert_name(D_sample, D_type)+'_before.root')
     leg_title = str(ecms) + ' MeV'
-    xmin = 1.8
-    xmax = 2.1
-    xbins = 150
-    plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample)
+    min = 3.7
+    max = 9.0
+    if D_sample == 'Dplus':
+        bins = 180
+    if D_sample == 'D0':
+        bins = 330
+    plot(path, leg_title, ecms, min, max, bins, D_sample, D_type)

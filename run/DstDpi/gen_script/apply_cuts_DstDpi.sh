@@ -15,8 +15,12 @@ FILENAME="Apply_Cuts_"$BOSS
 echo "#!/usr/bin/env bash" > $FILENAME
 echo "cd /besfs/groups/cal/dedx/$USER/bes/DstDpi" >> $FILENAME 
 for ECM in ${ECMS[@]}; do
-    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_before.root Dplus" >> $FILENAME
-    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_before.root D0" >> $FILENAME
-    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_sideband_before.root Dplus_sideband" >> $FILENAME
-    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_sideband_before.root D0_sideband" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_D0_before.root Dplus D" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_D0st_before.root Dplus Dst" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_Dplus_before.root D0 D" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_Dplusst_before.root D0 Dst" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_D0_sideband_before.root Dplus D_sideband" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_D0st_sideband_before.root Dplus Dst_sideband" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_Dplus_sideband_before.root D0 D_sideband" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_Dplusst_sideband_before.root D0 Dst_sideband" >> $FILENAME
 done

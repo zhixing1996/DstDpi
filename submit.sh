@@ -12,6 +12,7 @@ usage() {
     printf "\nOPTIONS\n" 
     printf "\n\t%-9s  %-40s"  "0.1"       "[run on data sample for DstDpi @703]"
     printf "\n\t%-9s  %-40s"  "0.2"       "[run on data sample for DstDpi @705]"
+    printf "\n\t%-9s  %-40s"  "0.3"       "[analyze ee-->D(*)Dpi]"
     printf "\n\n" 
 }
 
@@ -43,7 +44,9 @@ usage_0_2() {
 
 usage_0_3() {
     printf "\n\t%-9s  %-40s"  ""          ""
-    printf "\n\t%-9s  %-40s"  "0.3.1"     ""
+    printf "\n\t%-9s  %-40s"  "0.3.1"     "Plot RM(Dpi) distributions"
+    printf "\n\t%-9s  %-40s"  "0.3.2"     "Plot M(Dpi) distributions"
+    printf "\n\t%-9s  %-40s"  "0.3.3"     "Plot RM2(D) versus M2(Dpi)"
     printf "\n\t%-9s  %-40s"  ""           ""
     printf "\n"
 }
@@ -207,10 +210,34 @@ sub_0_3() {
 case $option in
     
     # --------------------------------------------------------------------------
-    #   
+    #  analysis
     # --------------------------------------------------------------------------
 
-    0.3.1) echo "..."
+    0.3.1) echo "Plot RM(Dpi) distributions ..."
+           cd ./run/DstDpi/gen_script
+           ./plot_rm_Dpi.sh
+           chmod u+x Plot_rm_Dpi
+           bash Plot_rm_Dpi
+           rm -r Plot_rm_Dpi
+           cd /besfs/groups/cal/dedx/$USER/bes/DstDpi
+	       ;;
+
+    0.3.2) echo "Plot M(Dpi) distributions ..."
+           cd ./run/DstDpi/gen_script
+           ./plot_m_Dpi.sh
+           chmod u+x Plot_m_Dpi
+           bash Plot_m_Dpi
+           rm -r Plot_m_Dpi
+           cd /besfs/groups/cal/dedx/$USER/bes/DstDpi
+	       ;;
+
+    0.3.3) echo "Plot RM2(D) versus M2(Dpi) ..."
+           cd ./run/DstDpi/gen_script
+           ./scatter_data.sh
+           chmod u+x Scatter_Data
+           bash Scatter_Data
+           rm -r Scatter_Data
+           cd /besfs/groups/cal/dedx/$USER/bes/DstDpi
 	       ;;
 
 esac
@@ -219,7 +246,7 @@ esac
 case $option in
     
     # --------------------------------------------------------------------------
-    #  Data  
+    #  Data @703 
     # --------------------------------------------------------------------------
 
     0.1) echo "Running on data sample @703..."
@@ -234,7 +261,7 @@ case $option in
            ;;  
         
     # --------------------------------------------------------------------------
-    #  
+    #  Data @705 
     # --------------------------------------------------------------------------
 
     0.2) echo "Running on data sample @705..."
@@ -249,17 +276,17 @@ case $option in
            ;;  
 
     # --------------------------------------------------------------------------
-    #  
+    #  Analysis
     # --------------------------------------------------------------------------
 
-    0.3) echo "..."
+    0.3) echo "Analyzing ee-->D(*)Dpi ..."
          usage_0_3 
          echo "Please enter your option: " 
          read option  
          sub_0_3 option 
 	     ;;
 
-    0.3.*) echo "..."
+    0.3.*) echo "Analyzing ee-->D(*)Dpi ..."
            sub_0_3 option  
            ;;  
 

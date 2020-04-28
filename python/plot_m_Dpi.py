@@ -11,6 +11,7 @@ from ROOT import *
 import sys, os
 import logging
 from math import *
+from tools import convert_name
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
 gStyle.SetOptTitle(0) # quench title
 gStyle.SetPadTickX(1) # dicide on boxing on or not of x and y axis  
@@ -22,7 +23,7 @@ NAME
     plot_m_Dpi.py
 
 SYNOPSIS
-    ./plot_m_Dpi.py [ecms] [D_sample]
+    ./plot_m_Dpi.py [ecms] [D_sample] [D_type]
 
 AUTHOR
     Maoqiang JING <jingmq@ihep.ac.cn>
@@ -30,13 +31,6 @@ AUTHOR
 DATE
     April 2020
 \n''')
-
-def set_legend(legend, h1, h2):
-    legend.AddEntry(h1, 'data')
-    legend.AddEntry(h2, 'sideband')
-    legend.SetBorderSize(0)
-    legend.SetFillColor(0)
-    legend.SetLineColor(0)
 
 def set_pavetext(pt):
     pt.SetFillStyle(0)
@@ -82,7 +76,7 @@ def set_canvas_style(mbc):
     mbc.SetTopMargin(0.1)
     mbc.SetBottomMargin(0.15)
 
-def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
+def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample, D_type):
     try:
         f_data = TFile(path[0])
         t_data = f_data.Get('save')
@@ -97,7 +91,7 @@ def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
         entries_sideband = t_sideband.GetEntries()
         logging.info('data(sideband) entries :'+str(entries_sideband))
     except:
-        logging.error(path[1] + ' is invalid!')
+        logging.error(path[0] + ' is invalid!')
         sys.exit()
 
     mbc = TCanvas('mbc', 'mbc', 800, 600)
@@ -121,17 +115,24 @@ def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
         os.makedirs('./figs/')
     
     if D_sample == 'Dplus':
-        h_data.Draw('E1')
-        h_sideband.Scale(0.5)
-        h_sideband.Draw('same')
-        legend = TLegend(0.3, 0.75, 0.5, 0.85)
-        set_legend(legend, h_data, h_sideband)
-        legend.Draw()
         pt = TPaveText(0.7, 0.7, 0.85, 0.85, "BRNDC")
         set_pavetext(pt)
         pt.Draw()
         pt.AddText(leg_title)
         pt.AddText('D^{+}#rightarrowK^{-}#pi^{+}#pi^{+}')
+    if D_sample == 'D0':
+        pt = TPaveText(0.2, 0.7, 0.45, 0.85, "BRNDC")
+        set_pavetext(pt)
+        pt.Draw()
+        pt.AddText(leg_title)
+        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}')
+        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{0}')
+        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{+}#pi^{-}')
+
+    if D_sample == 'Dplus':
+        h_data.Draw('E1')
+        h_sideband.Scale(0.5)
+        h_sideband.Draw('same')
 
     if D_sample == 'D0':
         p1 = TPad("pad", "pad", 0.0, 0.0, 1.0, 1.0)
@@ -144,16 +145,6 @@ def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
         h_data.Draw('E1')
         h_sideband.Scale(0.5)
         h_sideband.Draw('same')
-        legend = TLegend(0.6, 0.75, 0.9, 0.85)
-        set_legend(legend, h_data, h_sideband)
-        legend.Draw()
-        pt = TPaveText(0.2, 0.7, 0.45, 0.85, "BRNDC")
-        set_pavetext(pt)
-        pt.Draw()
-        pt.AddText(leg_title)
-        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}')
-        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{0}')
-        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{+}#pi^{-}')
         h_data_sub = TH1F('data_sub', 'data_sub', 400, 2.02, 2.82)
         set_histo_style(h_data_sub, xtitle, ytitle, 1)
         m_Dpi_fill(t_data, h_data_sub)
@@ -165,20 +156,46 @@ def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
         h_sideband_sub.Scale(0.5)
         h_sideband_sub.Draw('same')
 
-    mbc.SaveAs('./figs/m_Dpi_'+str(ecms)+'_'+D_sample+'.pdf')
-    raw_input('Press <Enter> to end...')
+    if D_sample == 'Dplus':
+        pt = TPaveText(0.7, 0.7, 0.85, 0.85, "BRNDC")
+        set_pavetext(pt)
+        pt.Draw()
+        pt.AddText(leg_title)
+        if D_type == 'D':
+            pt.AddText('e^{+}e^{-}#rightarrowD^{+}#pi_{0}^{-}#bar{D^{0}}')
+        if D_type == 'Dst':
+            pt.AddText('e^{+}e^{-}#rightarrowD^{+}#pi_{0}^{-}#bar{D^{*0}}')
+        pt.AddText('D^{+}#rightarrowK^{-}#pi^{+}#pi^{+}')
+    if D_sample == 'D0':
+        p1.cd()
+        pt = TPaveText(0.2, 0.6, 0.45, 0.85, "BRNDC")
+        set_pavetext(pt)
+        pt.Draw()
+        pt.AddText(leg_title)
+        if D_type == 'D':
+            pt.AddText('e^{+}e^{-}#rightarrowD^{0}#pi_{0}^{+}D^{-}')
+        if D_type == 'Dst':
+            pt.AddText('e^{+}e^{-}#rightarrowD^{0}#pi_{0}^{+}D^{*-}')
+        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}')
+        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{0}')
+        pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{+}#pi^{-}')
+
+    mbc.SaveAs('./figs/m_Dpi_'+str(ecms)+'_'+D_sample+'_'+D_type+'.pdf')
+
+    # raw_input('Press <Enter> to end...')
 
 if __name__ == '__main__':
     args = sys.argv[1:]
-    if len(args)<2:
+    if len(args)<3:
         usage()
         sys.exit()
     ecms = int(args[0])
     D_sample = args[1]
+    D_type = args[2]
 
     path = []
-    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/' + str(ecms) + '/data_' + str(ecms) + '_DstDpi_'+D_sample+'_before.root')
-    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/' + str(ecms) + '/data_' + str(ecms) + '_DstDpi_'+D_sample+'_sideband_before.root')
+    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'_'+convert_name(D_sample, D_type)+'_before.root')
+    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'_'+convert_name(D_sample, D_type)+'_sideband_before.root')
     leg_title = str(ecms) + ' MeV'
     if D_sample == 'Dplus':
         xmin = 2.0
@@ -188,4 +205,4 @@ if __name__ == '__main__':
         xmin = 2.0
         xmax = 2.9
         xbins = 450
-    plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample)
+    plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample, D_type)

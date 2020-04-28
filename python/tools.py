@@ -187,6 +187,17 @@ def set_root_style(stat=0, grid=0, PadTopMargin=0.08,
     ROOT.gStyle.SetOptStat(stat)
     ROOT.gStyle.SetStatColor(0)
     ROOT.gStyle.SetStatBorderSize(1)
+
+def convert_name(D_sample, D_type):
+    if D_sample == 'Dplus' and D_type == 'D':
+        name = 'D0'
+    if D_sample == 'Dplus' and D_type == 'Dst':
+        name = 'D0st'
+    if D_sample == 'D0' and D_type == 'D':
+        name = 'Dplus'
+    if D_sample == 'D0' and D_type == 'Dst':
+        name = 'Dplusst'
+    return name
     
 # ---------------------------------------------
 # Class 
