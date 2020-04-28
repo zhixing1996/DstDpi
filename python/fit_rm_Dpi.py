@@ -143,8 +143,8 @@ def fit(path, ecms, D_sample, D_type):
     bkgpdf = RooChebychev('bkgpdf', 'bkgpdf', rm_Dpi, RooArgList(a, b))
 
     # event number
-    nsig = RooRealVar('nsig', 'nsig', 500, 0, 100000)
-    nbkg = RooRealVar('nbkg', 'nbkg', 1000, 0, 100000)
+    nsig = RooRealVar('nsig', 'nsig', 500, 0, 10000000)
+    nbkg = RooRealVar('nbkg', 'nbkg', 1000, 0, 10000000)
 
     # fit model
     model = RooAddPdf('model', 'gauss+bkgpdf', RooArgList(gauss, bkgpdf), RooArgList(nsig, nbkg))

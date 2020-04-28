@@ -15,5 +15,8 @@ FILENAME="Apply_Cuts_"$BOSS
 echo "#!/usr/bin/env bash" > $FILENAME
 echo "cd /besfs/groups/cal/dedx/$USER/bes/DstDpi" >> $FILENAME 
 for ECM in ${ECMS[@]}; do
-    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_raw.root $PATH/$ECM/data_${ECM}_DstDpi_before.root $ECM before raw_signal" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_before.root Dplus" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_before.root D0" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_Dplus.root $PATH/$ECM/data_${ECM}_DstDpi_Dplus_sideband_before.root Dplus_sideband" >> $FILENAME
+    echo "./python/apply_cuts.py $PATH/$ECM/data_${ECM}_DstDpi_D0.root $PATH/$ECM/data_${ECM}_DstDpi_D0_sideband_before.root D0_sideband" >> $FILENAME
 done

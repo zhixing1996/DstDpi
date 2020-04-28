@@ -22,7 +22,7 @@ NAME
     plot_rm_Dpi.py
 
 SYNOPSIS
-    ./plot_rm_Dpi.py [ecms] [D_type]
+    ./plot_rm_Dpi.py [ecms] [D_sample]
 
 AUTHOR
     Maoqiang JING <jingmq@ihep.ac.cn>
@@ -37,15 +37,10 @@ def set_pavetext(pt):
     pt.SetTextAlign(10)
     pt.SetTextSize(0.03)
 
-def rm_Dpi_fill(t, h, D_type):
+def rm_Dpi_fill(t, h):
     for ientry in xrange(t.GetEntries()):
         t.GetEntry(ientry)
-        if D_type == 'Dplus':
-            if t.m_mode == 200:
-                h.Fill(t.m_rm_Dpi)
-        if D_type == 'D0':
-            if t.m_mode == 0 or t.m_mode == 1 or t.m_mode == 3:
-                h.Fill(t.m_rm_Dpi)
+        h.Fill(t.m_rm_Dpi)
 
 def set_histo_style(h, xtitle, ytitle):
     h.GetXaxis().SetNdivisions(509)
@@ -73,7 +68,7 @@ def set_canvas_style(mbc):
     mbc.SetTopMargin(0.1)
     mbc.SetBottomMargin(0.15)
 
-def plot(data_path, leg_title, ecms, xmin, xmax, xbins, D_type):
+def plot(data_path, leg_title, ecms, xmin, xmax, xbins, D_sample):
     try:
         f_data = TFile(data_path)
         t_data = f_data.Get('save')
@@ -88,27 +83,27 @@ def plot(data_path, leg_title, ecms, xmin, xmax, xbins, D_type):
     content = (xmax - xmin)/xbins * 1000
     ytitle = 'Events/%.1f MeV'%content
     xtitle = ''
-    if D_type == 'Dplus':
+    if D_sample == 'Dplus':
         xtitle = 'RM(D^{+}#pi^{-}_{0})(GeV)'
-    if D_type == 'D0':
+    if D_sample == 'D0':
         xtitle = 'RM(D^{0}#pi^{+}_{0})(GeV)'
     h_data = TH1F('data', 'data', xbins, xmin, xmax)
     
     set_histo_style(h_data, xtitle, ytitle)
-    rm_Dpi_fill(t_data, h_data, D_type)
+    rm_Dpi_fill(t_data, h_data)
     
     if not os.path.exists('./figs/'):
         os.makedirs('./figs/')
     
     h_data.Draw('E1')
 
-    if D_type == 'Dplus':
+    if D_sample == 'Dplus':
         pt = TPaveText(0.2, 0.7, 0.45, 0.85, "BRNDC")
         set_pavetext(pt)
         pt.Draw()
         pt.AddText(leg_title)
         pt.AddText('D^{+}#rightarrowK^{-}#pi^{+}#pi^{+}')
-    if D_type == 'D0':
+    if D_sample == 'D0':
         pt = TPaveText(0.2, 0.7, 0.45, 0.85, "BRNDC")
         set_pavetext(pt)
         pt.Draw()
@@ -117,9 +112,9 @@ def plot(data_path, leg_title, ecms, xmin, xmax, xbins, D_type):
         pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{0}')
         pt.AddText('D^{0}#rightarrowK^{-}#pi^{+}#pi^{+}#pi^{-}')
 
-    mbc.SaveAs('./figs/rm_Dpi_'+str(ecms)+'_'+D_type+'.pdf')
+    mbc.SaveAs('./figs/rm_Dpi_'+str(ecms)+'_'+D_sample+'.pdf')
 
-    raw_input('Enter anything to end...')
+    raw_input('Press <Enter> to end...')
 
 if __name__ == '__main__':
     args = sys.argv[1:]
@@ -127,11 +122,11 @@ if __name__ == '__main__':
         usage()
         sys.exit()
     ecms = int(args[0])
-    D_type = args[1]
+    D_sample = args[1]
 
-    data_path = '/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/' + str(ecms) + '/data_' + str(ecms) + '_DstDpi_raw.root'
+    data_path = '/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/' + str(ecms) + '/data_' + str(ecms) + '_DstDpi_'+D_sample+'.root'
     leg_title = str(ecms) + ' MeV'
     xmin = 1.8
     xmax = 2.1
     xbins = 150
-    plot(data_path, leg_title, ecms, xmin, xmax, xbins, D_type)
+    plot(data_path, leg_title, ecms, xmin, xmax, xbins, D_sample)
