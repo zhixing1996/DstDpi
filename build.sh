@@ -18,14 +18,16 @@ usage() {
 
 usage_0_0() {
     printf "\n\t%-9s  %-40s"  ""         ""   
-    printf "\n\t%-9s  %-40s"  "0.0.1"    "Build "
+    printf "\n\t%-9s  %-40s"  "0.0.1"    "Build DIY psi(4260) --> D2D generator"
     printf "\n\t%-9s  %-40s"  "0.0.2"    "Build "
     printf "\n"
 }
 
 usage_0_1() {
     printf "\n\t%-9s  %-40s"  ""         ""   
-    printf "\n\t%-9s  %-40s"  "0.1.1"    "Build DDECAYALGROOT module(01)"
+    printf "\n\t%-9s  %-40s"  "0.1.1"    "Build DDECAYALGROOT module(01) ---- haven't added missing track"
+    printf "\n\t%-9s  %-40s"  "0.1.2"    "Build DDECAYALGROOT module(02) ---- add missing track (wrong signed background)"
+    printf "\n\t%-9s  %-40s"  "0.1.3"    "Build DDECAYALGROOT module(03) ---- add missing track (sideband)"
     printf "\n\t%-9s  %-40s"  ""         ""
     printf "\n"
 }
@@ -46,7 +48,13 @@ case $option in
     #  Useful tools 
     # --------------------------------------------------------------------------
 
-    0.0.1) echo "Building  ..."
+    0.0.1) echo "Building DIY psi(4260) --> D2D generator ..."
+           mkdir -p ./Generator/BesEvtGen
+           cp /afs/ihep.ac.cn/bes3/offline/Boss/7.0.3.p01/Generator/BesEvtGen/BesEvtGen-00-03-98 ./Generator/BesEvtGen/ -rf
+           cp ./DIY/D2D/UsermDIY.cc ./Generator/BesEvtGen/BesEvtGen-00-03-98/user
+           cd ./Generator/BesEvtGen/BesEvtGen-00-03-98/cmt
+           cmt broadcast cmt config
+           cmt broadcast make
 	       ;;
 
     0.0.2) echo "Building  ..."
@@ -64,7 +72,23 @@ case $option in
     #  TESTPIALGROOT module
     # --------------------------------------------------------------------------
 
-    0.1.1) echo "Building DDECAYALGROOT module(03) ..."
+    0.1.1) echo "Building DDECAYALGROOT module(01) ..."
+           rm -rf ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-01/x86_*
+           cd ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-01/cmt
+           cmt config
+           gmake
+           source setup.sh
+	       ;;
+
+    0.1.2) echo "Building DDECAYALGROOT module(02) ..."
+           rm -rf ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-02/x86_*
+           cd ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-02/cmt
+           cmt config
+           gmake
+           source setup.sh
+	       ;;
+
+    0.1.3) echo "Building DDECAYALGROOT module(03) ..."
            rm -rf ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-03/x86_*
            cd ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-03/cmt
            cmt config

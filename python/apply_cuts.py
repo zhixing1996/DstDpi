@@ -15,6 +15,7 @@ from ROOT import TFile, TH1F, TLegend, TArrow, TChain, TVector3
 import sys, os
 import logging
 from math import *
+from tools import width_rawm_D, width_rm_Dpi
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def usage():
@@ -41,71 +42,58 @@ def save_before(file_in, file_out, D_sample, D_type):
         sys.exit()
 
     cut = ''
+    if D_sample == 'Dplus' and D_type == 'raw':
+        rawm_D_low = 1.86965 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86965 + width_rawm_D(D_sample)/2.
+        cut_Dplus = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
+        cut_chi2 = '(m_chi2_kf < 20)'
+        cut = cut_Dplus + ' && ' + cut_chi2
+
+    if D_sample == 'D0' and D_type == 'raw':
+        rawm_D_low = 1.86483 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86483 + width_rawm_D(D_sample)/2.
+        cut_D0 = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
+        cut_chi2 = '(m_chi2_kf < 20)'
+        cut = cut_D0 + ' && ' + cut_chi2
+
     if D_sample == 'Dplus' and D_type == 'D':
-        cut_Dplus = '(m_rawm_D > 1.858 && m_rawm_D < 1.879)'
-        cut_chi2 = '(m_chi2_kf < 20)'
-        cut_D0 = '(m_rm_Dpi > 1.85 && m_rm_Dpi < 1.88)'
-        cut = cut_Dplus + ' && ' + cut_chi2 + ' && ' + cut_D0
+        rawm_D_low = 1.86965 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86965 + width_rawm_D(D_sample)/2.
+        cut_Dplus = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
+        rm_Dpi_low = 1.86483 - width_rm_Dpi(D_sample, D_type)/2.
+        rm_Dpi_up = 1.86483 + width_rm_Dpi(D_sample, D_type)/2.
+        cut_D0 = '(m_rm_Dpi > ' + str(rm_Dpi_low) + ' && m_rm_Dpi < ' + str(rm_Dpi_up) + ')'
+        cut = cut_Dplus + ' && ' + cut_D0
+
     if D_sample == 'Dplus' and D_type == 'Dst':
-        cut_Dplus = '(m_rawm_D > 1.858 && m_rawm_D < 1.879)'
-        cut_chi2 = '(m_chi2_kf < 20)'
+        rawm_D_low = 1.86965 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86965 + width_rawm_D(D_sample)/2.
+        cut_Dplus = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
         cut_D0st = '(m_rm_Dpi > 1.996 && m_rm_Dpi < 2.019)'
-        cut = cut_Dplus + ' && ' + cut_chi2 + ' && ' + cut_D0st
+        cut = cut_Dplus + ' && ' + cut_D0st
+
     if D_sample == 'D0' and D_type == 'D':
-        cut_D0 = '(m_rawm_D > 1.851 && m_rawm_D < 1.874)'
-        cut_chi2 = '(m_chi2_kf < 20)'
-        cut_Dplus = '(m_rm_Dpi > 1.855 && m_rm_Dpi < 1.887)'
-        cut = cut_D0 + ' && ' + cut_chi2 + ' && ' + cut_Dplus
+        rawm_D_low = 1.86483 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86483 + width_rawm_D(D_sample)/2.
+        cut_D0 = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
+        rm_Dpi_low = 1.86965 - width_rm_Dpi(D_sample, D_type)/2.
+        rm_Dpi_up = 1.86965 + width_rm_Dpi(D_sample, D_type)/2.
+        cut_Dplus = '(m_rm_Dpi > ' + str(rm_Dpi_low) + ' && m_rm_Dpi < ' +  str(rm_Dpi_up) + ')'
+        cut = cut_D0 + ' && ' + cut_Dplus
+
     if D_sample == 'D0' and D_type == 'Dst':
-        cut_D0 = '(m_rawm_D > 1.851 && m_rawm_D < 1.874)'
-        cut_chi2 = '(m_chi2_kf < 20)'
+        rawm_D_low = 1.86483 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86483 + width_rawm_D(D_sample)/2.
+        cut_D0 = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
         cut_Dplusst = '(m_rm_Dpi > 1.996 && m_rm_Dpi < 2.028)'
-        cut = cut_D0 + ' && ' + cut_chi2 + ' && ' + cut_Dplusst
-    if D_sample == 'Dplus_sideband' and D_type == 'D':
-        D0_signal_low = 1.86483 - (1.88 - 1.85)/2.
-        D0_signal_up = 1.86483 + (1.88 - 1.85)/2.
-        D0_sidebandlow_up = D0_signal_low - (D0_signal_up - D0_signal_low)
-        D0_sidebandlow_low = D0_sidebandlow_up - (D0_signal_up - D0_signal_low)
-        D0_sidebandup_low = D0_signal_up + (D0_signal_up - D0_signal_low)
-        D0_sidebandup_up = D0_sidebandup_low + (D0_signal_up - D0_signal_low)
-        cut_Dplus = '(m_rawm_D > 1.858 && m_rawm_D < 1.879)'
-        cut_chi2 = '(m_chi2_kf < 20)'
-        cut_D0 = '((m_rm_Dpi > ' + str(D0_sidebandlow_low) + ' && m_rm_Dpi < ' + str(D0_sidebandlow_up) + ') || (m_rm_Dpi > ' + str(D0_sidebandup_low) + ' && m_rm_Dpi < ' + str(D0_sidebandup_up) + '))'
-        cut = cut_Dplus + ' && ' + cut_chi2 + ' && ' + cut_D0
-    if D_sample == 'Dplus_sideband' and D_type == 'Dst':
-        D0st_signal_low = 2.00685 - (2.019 - 1.996)/2.
-        D0st_signal_up = 2.00685 + (2.019 - 1.996)/2.
-        D0st_sidebandlow_up = D0st_signal_low - (D0st_signal_up - D0st_signal_low)
-        D0st_sidebandlow_low = D0st_sidebandlow_up - (D0st_signal_up - D0st_signal_low)
-        D0st_sidebandup_low = D0st_signal_up + (D0st_signal_up - D0st_signal_low)
-        D0st_sidebandup_up = D0st_sidebandup_low + (D0st_signal_up - D0st_signal_low)
-        cut_Dplus = '(m_rawm_D > 1.858 && m_rawm_D < 1.879)'
-        cut_chi2 = '(m_chi2_kf < 20)'
-        cut_D0st = '((m_rm_Dpi > ' + str(D0st_sidebandlow_low) + ' && m_rm_Dpi < ' + str(D0st_sidebandlow_up) + ') || (m_rm_Dpi > ' + str(D0st_sidebandup_low) + ' && m_rm_Dpi < ' + str(D0st_sidebandup_up) + '))'
-        cut = cut_Dplus + ' && ' + cut_chi2 + ' && ' + cut_D0st
-    if D_sample == 'D0_sideband' and D_type == 'D':
-        Dplus_signal_low = 1.86965 - (1.887 - 1.855)/2.
-        Dplus_signal_up = 1.86965 + (1.887 - 1.855)/2.
-        Dplus_sidebandlow_up = Dplus_signal_low - (Dplus_signal_up - Dplus_signal_low)
-        Dplus_sidebandlow_low = Dplus_sidebandlow_up - (Dplus_signal_up - Dplus_signal_low)
-        Dplus_sidebandup_low = Dplus_signal_up + (Dplus_signal_up - Dplus_signal_low)
-        Dplus_sidebandup_up = Dplus_sidebandup_low + (Dplus_signal_up - Dplus_signal_low)
-        cut_D0 = '(m_rawm_D > 1.851 && m_rawm_D < 1.874)'
-        cut_chi2 = '(m_chi2_kf < 20)'
-        cut_Dplus = '((m_rm_Dpi > ' + str(Dplus_sidebandlow_low) + ' && m_rm_Dpi < ' + str(Dplus_sidebandlow_up) + ') || (m_rm_Dpi > ' + str(Dplus_sidebandup_low) + ' && m_rm_Dpi < ' + str(Dplus_sidebandup_up) + '))'
-        cut = cut_D0 + ' && ' + cut_chi2 + ' && ' + cut_Dplus
-    if D_sample == 'D0_sideband' and D_type == 'Dst':
-        Dplusst_signal_low = 2.01026 - (2.028 - 1.996)/2.
-        Dplusst_signal_up = 2.01026 + (2.028 - 1.996)/2.
-        Dplusst_sidebandlow_up = Dplusst_signal_low - (Dplusst_signal_up - Dplusst_signal_low)
-        Dplusst_sidebandlow_low = Dplusst_sidebandlow_up - (Dplusst_signal_up - Dplusst_signal_low)
-        Dplusst_sidebandup_low = Dplusst_signal_up + (Dplusst_signal_up - Dplusst_signal_low)
-        Dplusst_sidebandup_up = Dplusst_sidebandup_low + (Dplusst_signal_up - Dplusst_signal_low)
-        cut_D0 = '(m_rawm_D > 1.851 && m_rawm_D < 1.874)'
-        cut_chi2 = '(m_chi2_kf < 20)'
-        cut_Dplusst = '((m_rm_Dpi > ' + str(Dplusst_sidebandlow_low) + ' && m_rm_Dpi < ' + str(Dplusst_sidebandlow_up) + ') || (m_rm_Dpi > ' + str(Dplusst_sidebandup_low) + ' && m_rm_Dpi < ' + str(Dplusst_sidebandup_up) + '))'
-        cut = cut_D0 + ' && ' + cut_chi2 + ' && ' + cut_Dplusst
-    
+        cut = cut_D0 + ' && ' + cut_Dplusst
+
+    if D_sample == 'Dplus' and D_type == 'missing':
+        rawm_D_low = 1.86965 - width_rawm_D(D_sample)/2.
+        rawm_D_up = 1.86965 + width_rawm_D(D_sample)/2.
+        cut_Dplus = '(m_rawm_D > ' + str(rawm_D_low) + ' && m_rawm_D < ' + str(rawm_D_up) + ')'
+        cut = cut_Dplus
+
     t = chain.CopyTree(cut)
     t.SaveAs(file_out)
 

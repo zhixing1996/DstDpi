@@ -160,7 +160,7 @@ def fit(path, ecms, D_sample):
 
     mbc.SaveAs('./figs/fit_m_Kpipi_'+str(ecms)+'_'+D_sample+'.pdf')
 
-    raw_input('Press <Enter> to end...')
+    # raw_input('Press <Enter> to end...')
 
 def main():
     args = sys.argv[1:]
@@ -170,7 +170,7 @@ def main():
     D_sample = args[1]
 
     path = []
-    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'.root')
+    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'_signal.root')
     fit(path, ecms, D_sample)
 
 if __name__ == '__main__':

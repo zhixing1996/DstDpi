@@ -81,10 +81,15 @@ case $option in
                     cd ../TestRelease/TestRelease-00-00-86/cmt
                     source setup.sh
                     cd /besfs/groups/cal/dedx/$USER/bes/DstDpi
-                    if [ ! -f "./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-03/cmt/setup.sh" ]; then
-                        echo "Please use ./build.sh 0.1.1 command to compile DDECAYALG analyzer and setup it..."
+                    if [ ! -f "./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-02/cmt/setup.sh" ]; then
+                        echo "Please use ./build.sh 0.1.2 command to compile DDECAYALG analyzer and setup it..."
+                    else
+                        source ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-02/cmt/setup.sh
+                    fi
+                    if [ ! -f "./Generator/BesEvtGen/BesEvtGen-00-03-98/cmt/setup.sh" ]; then
+                        echo "Maybe you donot want to use DIY generator..."
                     else 
-                        source ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-03/cmt/setup.sh
+                        source ./Generator/BesEvtGen/BesEvtGen-00-03-98/cmt/setup.sh
                     fi
                     ;;
 
@@ -96,10 +101,10 @@ case $option in
                 cd ../TestRelease/TestRelease-00-00-92/cmt
                 source setup.sh
                 cd /besfs/groups/cal/dedx/$USER/bes/DstDpi
-                if [ ! -f "./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-03/cmt/setup.sh" ]; then
+                if [ ! -f "./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-02/cmt/setup.sh" ]; then
                     echo "Please use ./build.sh 0.1.1 command to compile DDECAYALG analyzer and setup it..."
                 else 
-                    source ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-03/cmt/setup.sh
+                    source ./Analysis/Physics/DDecayAlg/DDecayAlg-00-00-02/cmt/setup.sh
                 fi
                 ;;
 

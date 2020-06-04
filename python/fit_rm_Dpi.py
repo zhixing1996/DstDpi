@@ -12,7 +12,7 @@ from array import array
 import sys, os
 import logging
 from math import *
-from tools import *
+from tools import luminosity, width_rm_Dpi
 from ROOT import *
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(levelname)s- %(message)s')
 
@@ -67,6 +67,12 @@ AUTHOR
 DATE
     April 2020
 \n''')
+
+def set_pavetext(pt):
+    pt.SetFillStyle(0)
+    pt.SetBorderSize(0)
+    pt.SetTextAlign(10)
+    pt.SetTextSize(0.03)
 
 def set_xframe_style(xframe, xtitle, ytitle):
     xframe.GetXaxis().SetTitle(xtitle)
@@ -129,7 +135,7 @@ def fit(path, ecms, D_sample, D_type):
 
     # signal
     if D_type == 'D':
-        mean = RooRealVar('mean', 'mean of gaussian', 1.864, 1.855, 1.875)
+        mean = RooRealVar('mean', 'mean of gaussian', 1.864, 1.85, 1.88)
         sigma = RooRealVar('sigma', 'sigma of gaussian', 0.001, 0, 0.01)
     if D_type == 'Dst':
         mean = RooRealVar('mean', 'mean of gaussian', 2.01026, 2.001, 2.02)
@@ -168,12 +174,57 @@ def fit(path, ecms, D_sample, D_type):
     range = 'Mass Window: [' + str(round(mean.getVal() - 2*sigma.getVal(), 3)) + ', ' + str(round(mean.getVal() + 2*sigma.getVal(), 3)) + '] GeV'
     print range
 
+    pt = TPaveText(0.2, 0.7, 0.35, 0.85, "BRNDC")
+    set_pavetext(pt)
+    pt.Draw()
+    title_pt = str(ecms) + ' MeV'
+    pt.AddText(title_pt)
+    if D_sample == 'Dplus' and D_type == 'D':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{+}#pi_{0}^{-}#bar{D^{0}}')
+    if D_sample == 'Dplus' and D_type == 'Dst':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{+}#pi_{0}^{-}#bar{D^{*0}}')
+    if D_sample == 'D0' and D_type == 'D':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{0}#pi_{0}^{+}D^{-}')
+    if D_sample == 'D0' and D_type == 'Dst':
+        pt.AddText('e^{+}e^{-}#rightarrowD^{0}#pi_{0}^{+}D^{*-}')
+    title_mean = 'Mean: ' + str(round(mean.getVal()*1000, 1) ) + ' MeV'
+    title_sigma = 'Sigma: ' + str(round(sigma.getVal()*1000, 1) ) + ' MeV'
+    pt.AddText(title_mean)
+    pt.AddText(title_sigma)
+
+    if not os.path.exists('./txts/'):
+        os.makedirs('./txts/')
+    path_num = './txts/events_'+str(ecms)+'_'+D_sample+'_'+D_type+'.txt'
+    f_num = open(path_num, 'w')
+    num = str(nsig.getVal()/luminosity(ecms)) + ' ' + str(nsig.getError()/luminosity(ecms)) + '\n'
+    f_num.write(num)
+    f_num.close()
+    path_param = './txts/param_'+str(ecms)+'_'+D_sample+'_'+D_type+'.txt'
+    f_param = open(path_param, 'w')
+    param = str(mean.getVal()) + ' ' + str(sigma.getVal()) + '\n'
+    f_param.write(param)
+    f_param.write(range)
+    f_param.close()
+
+    rm_Dpi_low = 1.86483 - width_rm_Dpi(D_sample, D_type)/2.
+    rm_Dpi_up = 1.86483 + width_rm_Dpi(D_sample, D_type)/2.
+    rm_Dpi.setRange('srange', rm_Dpi_low, rm_Dpi_up)
+    rm_Dpi.setRange('allrange', xmin, xmax)
+    sbkg = bkgpdf.createIntegral(RooArgSet(rm_Dpi), RooFit.NormSet(RooArgSet(rm_Dpi)), RooFit.Range('srange'))
+    allbkg = bkgpdf.createIntegral(RooArgSet(rm_Dpi), RooFit.NormSet(RooArgSet(rm_Dpi)), RooFit.Range('allrange'))
+    n_bkg = sbkg.getVal()/allbkg.getVal() * (nbkg.getVal())
+
+    path_nbkg = './txts/nbkg_'+str(ecms)+'_'+D_sample+'_'+D_type+'.txt'
+    f_nbkg = open(path_nbkg, 'w')
+    f_nbkg.write(str(n_bkg))
+    f_nbkg.close()
+
     if not os.path.exists('./figs/'):
         os.makedirs('./figs/')
 
     mbc.SaveAs('./figs/fit_rm_Dpi_'+str(ecms)+'_'+D_sample+'_'+D_type+'.pdf')
 
-    raw_input('Press <Enter> to end...')
+    # raw_input('Press <Enter> to end...')
 
 def main():
     args = sys.argv[1:]
@@ -184,7 +235,7 @@ def main():
     D_type = args[2]
 
     path = []
-    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'.root')
+    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'_signal_missing_before.root')
     fit(path, ecms, D_sample, D_type)
 
 if __name__ == '__main__':

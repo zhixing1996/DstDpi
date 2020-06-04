@@ -189,6 +189,7 @@ def set_root_style(stat=0, grid=0, PadTopMargin=0.08,
     ROOT.gStyle.SetStatBorderSize(1)
 
 def convert_name(D_sample, D_type):
+    name = ''
     if D_sample == 'Dplus' and D_type == 'D':
         name = 'D0'
     if D_sample == 'Dplus' and D_type == 'Dst':
@@ -198,7 +199,72 @@ def convert_name(D_sample, D_type):
     if D_sample == 'D0' and D_type == 'Dst':
         name = 'Dplusst'
     return name
+
+def luminosity(ecms):
+    lum = 0.
+    if ecms == 4600:
+        lum = 586.9
+    if ecms == 4620:
+        lum = 511
+    if ecms == 4640:
+        lum = 541
+    if ecms == 4660:
+        lum = 529
+    if ecms == 4680:
+        lum = 528.46
+    if ecms == 4700:
+        lum = 526.20
+    return lum
+
+def width_rawm_D(D_sample):
+    width = 0.
+    if D_sample == 'Dplus':
+        width = 0.02
+    if D_sample == 'D0':
+        width = 0.04
+    return width
+
+def width_rm_Dpi(D_sample, D_type):
+    width = 0.
+    if D_sample == 'Dplus' and D_type == 'D':
+        width = 0.024
+    if D_sample == 'D0' and D_type == 'D':
+        width = 0.04
+    return width
+
+def search(allfile, root, target):
+    items = os.listdir(root)
+    for item in items:
+        if item[0] == '.':
+            continue
+        path = os.path.join(root, item)
+        if os.path.isdir(path):
+            search(allfile, path, target)
+        else:
+            if target in path:
+                allfile.append(path)
+    return allfile
     
+def group_files_by_num(name_list, num_total):
+    groups = []
+    group = []
+    num_sum = 0
+
+    for name in name_list:
+        if int(num_sum) < int(num_total):
+            group.append(name)
+            num_sum = num_sum + 1
+        else:
+            groups.append(group)
+            group = []
+            num_sum = 0
+            group.append(name)
+            num_sum = num_sum + 1
+
+        if name == name_list[-1]:
+            groups.append(group)    
+    return groups
+
 # ---------------------------------------------
 # Class 
 # ---------------------------------------------

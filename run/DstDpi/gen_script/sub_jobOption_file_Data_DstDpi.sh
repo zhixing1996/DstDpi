@@ -3,7 +3,7 @@
 BOSS=$1
 
 if [ "$BOSS" = "703" ]; then
-    ECMS=("4470" "4530" "4575" "4600")
+    ECMS=("4600")
 fi
 
 if [ "$BOSS" = "705" ]; then

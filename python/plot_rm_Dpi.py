@@ -37,10 +37,18 @@ def set_pavetext(pt):
     pt.SetTextAlign(10)
     pt.SetTextSize(0.03)
 
-def rm_Dpi_fill(t, h):
+def set_arrow(arrow, color):
+    arrow.SetLineWidth(0)
+    arrow.SetLineColor(color)
+    arrow.SetFillColor(color)
+
+def rm_Dpi_fill(t, h, D_sample):
     for ientry in xrange(t.GetEntries()):
         t.GetEntry(ientry)
-        h.Fill(t.m_rm_Dpi)
+        if D_sample == 'Dplus':
+            h.Fill(t.m_rm_Dpi)
+        if D_sample == 'D0':
+            h.Fill(t.m_rm_Dpi)
 
 def set_histo_style(h, xtitle, ytitle):
     h.GetXaxis().SetNdivisions(509)
@@ -90,7 +98,7 @@ def plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample):
     h_data = TH1F('data', 'data', xbins, xmin, xmax)
     
     set_histo_style(h_data, xtitle, ytitle)
-    rm_Dpi_fill(t_data, h_data)
+    rm_Dpi_fill(t_data, h_data, D_sample)
     
     if not os.path.exists('./figs/'):
         os.makedirs('./figs/')
@@ -125,9 +133,9 @@ if __name__ == '__main__':
     D_sample = args[1]
 
     path =[]
-    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/' + str(ecms) + '/data_' + str(ecms) + '_DstDpi_'+D_sample+'.root')
+    path.append('/besfs/groups/cal/dedx/$USER/bes/DstDpi/run/DstDpi/anaroot/data/'+str(ecms)+'/data_'+str(ecms)+'_DstDpi_'+D_sample+'_before.root')
     leg_title = str(ecms) + ' MeV'
-    xmin = 1.8
-    xmax = 2.1
-    xbins = 150
+    xmin = 1.75
+    xmax = 2.15
+    xbins = 80
     plot(path, leg_title, ecms, xmin, xmax, xbins, D_sample)

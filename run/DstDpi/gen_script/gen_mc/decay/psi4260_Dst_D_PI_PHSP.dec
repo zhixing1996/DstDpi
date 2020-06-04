@@ -1,0 +1,18 @@
+Decay  psi(4260)
+1.00  D*+  anti-D0  pi-  PHSP;
+1.00  D*-  D0       pi+  PHSP;
+Enddecay
+
+Decay D0
+0.0389  K-  pi+            PHSP;
+0.1420  K-  pi+  pi0       D_DALITZ;
+0.0811  K-  pi+  pi+  pi-  PHSP;
+Enddecay
+
+Decay anti-D0
+0.0389  K+  pi-            PHSP;
+0.1420  K+  pi-  pi0       D_DALITZ;
+0.0811  K+  pi-  pi-  pi+  PHSP;
+Enddecay
+
+End
